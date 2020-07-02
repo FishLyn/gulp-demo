@@ -196,9 +196,6 @@ const gitUpdate = done => {
 }
 
 
-
-
-
 // 编译组合任务
 const compile = parallel(style, script, page)
 
