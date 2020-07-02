@@ -2,13 +2,15 @@
 const { src, dest, series, parallel, watch } = require('gulp')
 const loadPlugins = require('gulp-load-plugins')
 const browserSync = require('browser-sync')
+const minimist = require('minimist')
 const del = require('del')
 const Comb = require('csscomb')
 const standard = require('standard')
-const path = require('path')
 
 const plugins = loadPlugins()
 const bs = browserSync.create()
+
+const argv = minimist(process.argv.slice(2))
 
 const data = {
     menus: [
@@ -91,7 +93,7 @@ const font = () => {
         .pipe(dest('dist'))
 }
 
-// 其他文件拷贝 
+// 其他文件拷贝
 const extra = () => {
     return src('public/**', { base: 'public' })
         .pipe(dest('dist'))
@@ -145,12 +147,52 @@ const distServer = () => {
     })
 }
 
+// 将编译后的静态项目部署到 github 的 gh-pages 分支预览
 const upload = () => {
     return src('**', { cwd: 'dist' })
         .pipe(plugins.ghPages({
-            chcheDir: 'temp/publish',
+            cacheDir: 'temp/publish',
             branch: 'gh-pages'
         }))
+}
+
+// 初始化 git 仓库并上传
+const gitInit = done => {
+    plugins.git.init(err => {
+        if (err) throw err
+    })
+
+    plugins.git.addRemote('origin', 'https://github.com/FishLyn/gulp-demo.git', (err) => {
+        if (err) throw err
+    })
+
+    done()
+}
+
+const removeRemote = done => {
+    plugins.git.removeRemote('origin', (err) => { if (err) throw err })
+
+    done()
+}
+
+// 上传更新后的项目文件
+const gitUpdate = done => {
+    const message = argv.message || 'update'
+
+    src('.')
+    .pipe(plugins.git.add())
+    .pipe(
+        plugins.git.commit(undefined, {
+            args: `-m "${message}"`,
+            disableMessageRequirement: true
+        })
+    )
+
+    plugins.git.push('origin', 'master', (err) => {
+        if (err) throw err
+    })
+
+    done()
 }
 
 // 编译组合任务
@@ -165,6 +207,7 @@ const start = series(build, distServer)
 // 打开服务器监听开发代码，实时编译
 const serve = series(compile, devServer)
 
+// 将编译后的静态项目部署到 github 的 gh-pages 分支下
 const deploy = series(build, upload)
 
 module.exports = {
@@ -173,5 +216,8 @@ module.exports = {
     build,
     start,
     clean,
-    deploy
+    deploy,
+    gitInit,
+    gitUpdate,
+    removeRemote
 }
