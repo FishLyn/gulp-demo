@@ -156,26 +156,7 @@ const upload = () => {
         }))
 }
 
-// 初始化 git 仓库并上传
-const gitInit = done => {
-    plugins.git.init(err => {
-        if (err) throw err
-    })
-
-    plugins.git.addRemote('origin', 'https://github.com/FishLyn/gulp-demo.git', (err) => {
-        if (err) throw err
-    })
-
-    done()
-}
-
-const removeRemote = done => {
-    plugins.git.removeRemote('origin', (err) => { if (err) throw err })
-
-    done()
-}
-
-// 上传更新后的项目文件
+// 更新本地仓库
 const gitCommit = () => {
     const message = argv.message || 'update'
 
@@ -189,6 +170,7 @@ const gitCommit = () => {
     )
 }
 
+// 推送到远程仓库
 const gitPush = done => {
     plugins.git.push('origin', 'master', (err) => {
         if (err) throw err
@@ -221,7 +203,5 @@ module.exports = {
     start,
     clean,
     deploy,
-    gitInit,
-    gitUpdate,
-    removeRemote
+    gitUpdate
 }
