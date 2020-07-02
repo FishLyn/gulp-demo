@@ -176,10 +176,10 @@ const removeRemote = done => {
 }
 
 // 上传更新后的项目文件
-const gitUpdate = done => {
+const gitUpdate = async done => {
     const message = argv.message || 'update'
 
-    src('.')
+    await src('.')
     .pipe(plugins.git.add())
     .pipe(
         plugins.git.commit(undefined, {
@@ -188,18 +188,12 @@ const gitUpdate = done => {
         })
     )
 
-    plugins.git.push('origin', 'master', (err) => {
+    await plugins.git.push('origin', 'master', (err) => {
         if (err) throw err
     })
 
     done()
 }
-
-
-
-
-
-
 
 // 编译组合任务
 const compile = parallel(style, script, page)
