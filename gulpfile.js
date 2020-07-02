@@ -156,18 +156,23 @@ const upload = () => {
         }))
 }
 
+// 添加修改的文件
+const gitAdd = () => {
+    return src('.')
+        .pipe(plugins.git.add())
+}
+
 // 更新本地仓库
 const gitCommit = () => {
     const message = argv.message || 'update'
 
     return src('.')
-    .pipe(plugins.git.add())
-    .pipe(
-        plugins.git.commit(undefined, {
-            args: `-m "${message}"`,
-            disableMessageRequirement: true
-        })
-    )
+        .pipe(
+            plugins.git.commit(undefined, {
+                args: `-m "${message}"`,
+                disableMessageRequirement: true
+            })
+        )
 }
 
 // 推送到远程仓库
@@ -194,7 +199,7 @@ const serve = series(compile, devServer)
 // 将编译后的静态项目部署到 github 的 gh-pages 分支下
 const deploy = series(build, upload)
 
-const update = series(gitCommit, gitPush)
+const update = series(gitAdd, gitCommit, gitPush)
 
 module.exports = {
     lint,
