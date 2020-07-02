@@ -29,7 +29,8 @@
     "serve": "gulp serve",
     "build": "gulp build",
     "start": "gulp start",
-    "deploy": "gulp deploy --production"
+    "deploy": "gulp deploy --production",
+    "update": "gulp update"
   },
   "browserslist": [
     "last 1 version",

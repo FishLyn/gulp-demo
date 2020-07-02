@@ -194,7 +194,7 @@ const serve = series(compile, devServer)
 // 将编译后的静态项目部署到 github 的 gh-pages 分支下
 const deploy = series(build, upload)
 
-const gitUpdate = series(gitCommit, gitPush)
+const update = series(gitCommit, gitPush)
 
 module.exports = {
     lint,
@@ -203,5 +203,5 @@ module.exports = {
     start,
     clean,
     deploy,
-    gitUpdate
+    update
 }
