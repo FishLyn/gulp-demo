@@ -176,10 +176,10 @@ const removeRemote = done => {
 }
 
 // 上传更新后的项目文件
-const gitUpdate = async done => {
+const gitCommit = () => {
     const message = argv.message || 'update'
 
-    await src('.')
+    return src('.')
     .pipe(plugins.git.add())
     .pipe(
         plugins.git.commit(undefined, {
@@ -187,8 +187,10 @@ const gitUpdate = async done => {
             disableMessageRequirement: true
         })
     )
+}
 
-    await plugins.git.push('origin', 'master', (err) => {
+const gitPush = done => {
+    plugins.git.push('origin', 'master', (err) => {
         if (err) throw err
     })
 
@@ -209,6 +211,8 @@ const serve = series(compile, devServer)
 
 // 将编译后的静态项目部署到 github 的 gh-pages 分支下
 const deploy = series(build, upload)
+
+const gitUpdate = series(gitCommit, gitPush)
 
 module.exports = {
     lint,
